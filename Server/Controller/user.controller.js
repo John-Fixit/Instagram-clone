@@ -1,4 +1,5 @@
-const userModel = require('../Model/user.model')
+
+const {userModel, userPostModel} = require('../Model/user.model')
 const jwt = require('jsonwebtoken')
 const cloudinary = require('cloudinary')
 require('dotenv').config()
@@ -60,7 +61,7 @@ const signin = (req, res) => {
                     else {
                         if (same) {
                             console.log(`Its correct`);
-                            const token = jwt.sign({ email }, SECRET, { expiresIn: '1h'})
+                            const token = jwt.sign({ email }, SECRET, { expiresIn: '6h'})
                             res.send({ message: `correct password`, status: true, token })
                         }
                         else {
@@ -75,7 +76,6 @@ const signin = (req, res) => {
 }
 const home = (req, res)=>{
     const token = req.headers.authorization.split(' ')[1]
-
     jwt.verify(token, SECRET, (err,result)=>{
         if(err){
             res.send({status: false, message: `unathorized user`})
@@ -91,7 +91,14 @@ const home = (req, res)=>{
                         if(err){
                             console.log(`There's an error`);
                         }else{
-                            res.send({message:`authorization verified`, status: true, userDetails, result})
+                            userPostModel.find((err, allPosts)=>{
+                                if(err){
+                                    console.log(`There's an error`);
+                                }
+                                else{
+                                    res.send({message:`authorization verified`, status: true, userDetails, result, allPosts})
+                                }
+                            })
                         }
                     })
                 }
@@ -141,26 +148,73 @@ const createPost=(req, res)=>{
     const responseFromClient = req.body.myFile
     cloudinary.v2.uploader.upload(responseFromClient, (err, result)=>{
         if(err){
+            console.log(err);
             console.log(`Not uploaded yet`);
+            res.send({message:`An error occur in the uploading, please try again`, status: false})
         }else{
             const secureUrl = result.secure_url
-            res.send({secureUrl})
+            res.send({secureUrl, status: true})
         }
     })
 }
 const savePost=(req, res)=>{
-    const userId = req.body.userId;
     const postCaption = req.body.postCaption
-    const postLink = req.body.myPostLink
-    const userPost = {postLink, postCaption}
+    const postLink = req.body.postLink
+    const postLocation = req.body.postLocation
+    const postTime = req.body.postTime
+    const userId = req.body.userId
+    const like = req.body.like
+    const userPost = {postCaption, postLink, postLocation, postTime, like}
+    const userPostDetails = req.body
+    console.log(userPostDetails);
     userModel.findOneAndUpdate({'_id': `${userId}`}, {$push:{'userPosts': userPost}}, (err, result)=>{
         if(err){
             console.log(`unable to post`);
             res.send({message:`Unable to share your post`, status: false})
         }else{
-            console.log(result);
             res.send({message:`Your post will be published shortly`, status: true, result})
         }
     })
+    let form = new userPostModel(userPostDetails)
+    form.save((err)=>{
+        if(err){
+            console.log(`Error dey`);
+        }
+        else{
+                userPostModel.find((err, result)=>{
+                    if(err){
+                        console.log(`there's error`);
+                    }
+                    else{
+                        // console.log(result);
+                    }
+                })
+        }
+    })
 }
-module.exports = { landingPage, signup, signin, home, upload, follow, createPost, savePost }
+const like=(req, res)=>{
+    const likeDetail = req.body
+    // console.log(likeDetail);
+    userPostModel.findOneAndUpdate({'postLink': `${likeDetail.postLink}`}, { $push:{'noOfLikes': likeDetail}}, (err, result)=>{
+        if(err){
+            console.log(err);
+        }else{
+            // console.log(result);
+        }
+    })
+    userModel.findOne({'_id': likeDetail.user_id}, (err, thisUser)=>{
+        if(err){
+            console.log(err);
+        }else{
+            // console.log(thisUser);
+            userModel.thisUser.findOneAndUpdate({'postLink': likeDetail.postLink}, {$push:{'like':likeDetail}},(err, myLikeResult)=>{
+                if(err){
+                    console.log(err);
+                }else{
+                    console.log(`Thank God I saw it`);
+                }
+            })  
+        }
+    })
+}
+module.exports = { landingPage, signup, signin, home, upload, follow, createPost, savePost, like }

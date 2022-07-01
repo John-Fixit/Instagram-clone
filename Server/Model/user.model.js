@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs')
-const userShema = mongoose.Schema({
+const userShema = new mongoose.Schema({
     fullname: String,
     username: String,
     email: String,
@@ -9,12 +9,16 @@ const userShema = mongoose.Schema({
     followers:[],
     userPosts:[]
 })
-const userPostSchema = mongoose.Schema({
+const userPostSchema = new mongoose.Schema({
     username: String,
-    noOfLikes : [],
+    userId: String,
     postLink: String,
     postCaption: String,
-    postLocation: String
+    postLocation: String,
+    postTime: {},
+    profilePicture: String,
+    noOfLikes : [],
+    allComments:[]
 })
 let saltRound = 10;
 userShema.pre("save", function(next){

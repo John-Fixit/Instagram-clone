@@ -9,4 +9,5 @@ userRouter.post('/upload', userController.upload)
 userRouter.post('/follow', userController.follow)
 userRouter.post('/createPost', userController.createPost)
 userRouter.post('/savePost', userController.savePost)
+userRouter.post('/like', userController.like)
 module.exports = userRouter

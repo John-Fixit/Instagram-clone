@@ -3,8 +3,8 @@ const app = express();
 const userRouter = require('./Routes/user.route')
 const cors = require('cors')
 const bodyParser = require('body-parser');
-app.use(bodyParser.urlencoded({extended: '100mb'}))
-app.use(bodyParser.json('100mb'))
+app.use(bodyParser.urlencoded({extended: true,limit:"100mb"}))
+app.use(bodyParser.json({limit:'100mb'}))
 app.use(cors())
 const mongoose = require('mongoose')
 require("dotenv").config();
