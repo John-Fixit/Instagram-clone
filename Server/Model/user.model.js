@@ -32,7 +32,6 @@ userShema.pre("save", function(next){
     })
 })
 userShema.methods.validatePassword = function(password, callback){
-
     bcrypt.compare(password, this.password, (err, same)=>{
         if(!err){
             callback(err, same)

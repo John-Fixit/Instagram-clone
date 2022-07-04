@@ -10,4 +10,5 @@ userRouter.post('/follow', userController.follow)
 userRouter.post('/createPost', userController.createPost)
 userRouter.post('/savePost', userController.savePost)
 userRouter.post('/like', userController.like)
+userRouter.post('/comment', userController.comment)
 module.exports = userRouter
