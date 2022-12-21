@@ -54,6 +54,7 @@
     overflow: auto;
     height: 100vh;
 }
+
 .scroll-col::-webkit-scrollbar-thumb{
     background: rgb(230, 99, 143);
   border-radius: 10px;

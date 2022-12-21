@@ -33,9 +33,10 @@ function Signin() {
         .post(URI, signInReq)
         .then((res) => {
           let feedBack = res.data;
+          console.log(res)
           setisComing(false);
           setdisableBtn(false)
-          if (res.data.status) {
+          if (res.status==200) {
             if (feedBack.status) {
               const token = res.data.token;
               localStorage.token = JSON.stringify(token);

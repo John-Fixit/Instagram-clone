@@ -18,7 +18,7 @@ function Navbar({thisUserDetail}) {
     const userDetails = JSON.parse(localStorage.getItem('userDetails'))
     useEffect(() => {
         console.log(thisUserDetail);
-        setprofilePicture(userDetails.profilePicture)
+        setprofilePicture(thisUserDetail.profilePicture)
     })
     const logOut = () => {
         localStorage.removeItem('token')

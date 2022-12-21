@@ -3,6 +3,9 @@ const { userModel, userPostModel } = require('../Model/user.model')
 const jwt = require('jsonwebtoken')
 const cloudinary = require('cloudinary')
 const socket_io = require('../index')
+const server = require('socket.io')
+const cors = require('cors')
+
 require('dotenv').config()
 const SECRET = process.env.JWT_SECRET
 
@@ -49,7 +52,7 @@ const signin = (req, res) => {
         }
         else {
             if (!user) {
-                res.send({ message: `sorry! seems like you don't have account with me kindly proceed to signup`, status: false })
+                res.send({ message: `sorry! seems like you don't have account yet, kindly proceed to signup`, status: false })
             }
             else {
                 user.validatePassword(password, (err, same) => {
@@ -254,4 +257,18 @@ const comment = (req, res) => {
     })
 }
 
-module.exports = { landingPage, signup, signin, home, upload, follow, createPost, savePost, like, comment}
+const currentChattingUser=(req, res)=>{
+    console.log(req.body);
+}
+
+const io = server(socket_io, {cors: {origin: '*'}})
+
+io.on('connection', (socket)=>{
+    console.log(`user connected with ${socket.id}`);
+
+    io.on('disconnect', ()=>{
+        console.log(`user disconnect with ${socket.id}`);
+    })
+})
+
+module.exports = { landingPage, signup, signin, home, upload, follow, createPost, savePost, like, comment, currentChattingUser}

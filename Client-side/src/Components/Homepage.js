@@ -88,7 +88,7 @@ function Homepage() {
         <Route path='/post' element={<Post />}/>
         <Route path='/chat' element={<Messanger allUsers={allUsers}/>}/>
         <Route path='/:id' element={<Profile />} />
-        <Route path='/message' element={<Messanger />} />
+        <Route path='/message' element={<Messanger  allUsers={allUsers} thisUserDetail={thisUserDetail}/>} />
       </Routes>
     </>
   )

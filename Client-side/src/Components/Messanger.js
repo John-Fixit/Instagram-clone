@@ -3,15 +3,20 @@ import { FaArrowAltCircleRight, FaTelegram, FaTelegramPlane, FaRegSmile, FaRegIm
 import img from "../Images/user.PNG";
 import io from "socket.io-client";
 const socket = io.connect("http://localhost:4000");
-function Messanger({ allUsers }) {
+function Messanger({ allUsers, thisUserDetail }) {
   const [messageText, setmessageText] = useState("");
   const [allMessage, setallMessage] = useState([]);
+  const [friendId, setfriendId] = useState('')
 
-  const chatMe = (userId) => {
-
-  };
+  const currentChatUser=(id)=>{
+    console.log(id);
+    setfriendId(id)
+  }
   const sendMessage = () => {
-    let senderName = socket.emit("message", messageText);
+    const currentTime = new Date(Date.now()).getHours() + ':' + new Date(Date.now()).getMinutes()
+    const thisUserId = thisUserDetail != undefined ? thisUserDetail._id : ''
+    // socket.emit("message", {messageText, friendId, currentTime, thisUserId});
+    socket.emit("message", {messageText});
   };
   useEffect(() => {
     if (allUsers.length) {
@@ -32,7 +37,7 @@ function Messanger({ allUsers }) {
                     <div
                       key={index}
                       className="bg-white cursorPointer my-2"
-                      onClick={() => chatMe(user._id)}
+                      onClick={() => currentChatUser(user._id)}
                     >
                       <div className="d-flex chatFriend">
                         <img

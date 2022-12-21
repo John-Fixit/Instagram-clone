@@ -6,7 +6,6 @@ const userShema = new mongoose.Schema({
     email: String,
     password: String,
     profilePicture: String,
-    allMessage: [],
     followers:[],
     userPosts:[]
 })

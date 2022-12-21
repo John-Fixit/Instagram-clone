@@ -3,7 +3,7 @@ const app = express();
 const userRouter = require('./Routes/user.route')
 const cors = require('cors')
 const bodyParser = require('body-parser');
-const Server = require('socket.io')
+const server = require('socket.io')
 app.use(bodyParser.urlencoded({extended: true,limit:"100mb"}))
 app.use(bodyParser.json({limit:'100mb'}))
 app.use(cors())
@@ -23,14 +23,27 @@ const PORT = process.env.PORT || 3000
 const socket_io = app.listen(PORT, ()=>{
     console.log(`App is listening on port ${PORT}`);
 })
-const io = Server(socket_io, {cors: {origin: '*'}})
-io.on('connection', (socket)=>{
-    console.log(`user connected!`, socket.id);
-    socket.on('message', (data)=>{
-        console.log(data);
 
+module.exports = socket_io
+const io = server(socket_io, {cors: {origin: '*'}})
+global.onlineUser=new Map();
+
+io.on('connection', (socket)=>{
+    global.chatSocket = socket;
+    
+    io.on('add_user', (userId)=>{
+        onlineUser.set(userId, socket.id)
     })
-    socket.on('disconnect', ()=>{
-        console.log(`user disconnected`, socket.id);
+
+    io.on('send-msg', (msgData)=>{
+        console.log(msgData)
+        const sendUserSocket = onlineUser.get(msgData.to)
+        if(sendUserSocket){
+            io.to(sendUserSocket).emit('recieve-msg', {message: msgData.msg})
+        }
+    })
+
+    io.on('disconnect', ()=>{
+       console.log(`user disconnected with id: ${socket.id}`)
     })
 })
