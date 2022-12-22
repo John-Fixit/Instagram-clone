@@ -1,94 +1,68 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FaArrowAltCircleRight, FaTelegram, FaTelegramPlane, FaRegSmile, FaRegImage, FaRegHeart } from "react-icons/fa";
 import img from "../Images/user.PNG";
-import io from "socket.io-client";
-const socket = io.connect("http://localhost:4000");
-function Messanger({ allUsers, thisUserDetail }) {
-  const [messageText, setmessageText] = useState("");
-  const [allMessage, setallMessage] = useState([]);
-  const [friendId, setfriendId] = useState('')
+// import io from "socket.io-client";
+import Contact from "./Pages/Contact";
+import {io} from 'socket.io-client'
+import ChatContainer from "./Pages/ChatContainer";
+import styled from "styled-components";
 
-  const currentChatUser=(id)=>{
-    console.log(id);
-    setfriendId(id)
-  }
-  const sendMessage = () => {
-    const currentTime = new Date(Date.now()).getHours() + ':' + new Date(Date.now()).getMinutes()
-    const thisUserId = thisUserDetail != undefined ? thisUserDetail._id : ''
-    // socket.emit("message", {messageText, friendId, currentTime, thisUserId});
-    socket.emit("message", {messageText});
-  };
-  useEffect(() => {
-    if (allUsers.length) {
-      console.log(allUsers);
+import axios from "axios";
+import { baseUrl, sendMsg } from "./Utils/ApiRoutes";
+// const socket = io.connect(baseUrl);
+function Messanger({ allUsers, thisUserDetail }) {
+  const [allMessage, setallMessage] = useState([]);
+  const [currentUser, setcurrentUser] = useState(undefined)
+  const [messageText, setmessageText] = useState('')
+  const socket = useRef()
+  useEffect(()=>{
+    setcurrentUser(thisUserDetail)
+  }, [])
+
+  useEffect(()=>{
+    if(currentUser){
+      socket.current = io(baseUrl)
+      socket.current.emit('add_user', currentUser._id)
     }
-  }, []);
+
+  }, [currentUser])
+
+  const sendMsg=(data)=>{
+    console.log(data)
+      // axios.post(sendMsg, data).then((res)=>{
+      //   console.log(res)
+      // })
+  }
+
+  const changeCurrentChat=(data)=>{
+      console.log(thisUserDetail._id)
+      console.log(data)
+  }
+
+
 
   return (
-    <>
-      <div className="gen_body">
-        <div className="container">
+    <Container>
+      <div className="gen_body col-sm-7 mx-auto">
           <div className="row">
-            <div className="col-4 border card">
-              
-              <div className="users">
-                {allUsers.length ? (
-                  allUsers.map((user, index) => (
-                    <div
-                      key={index}
-                      className="bg-white cursorPointer my-2"
-                      onClick={() => currentChatUser(user._id)}
-                    >
-                      <div className="d-flex chatFriend">
-                        <img
-                          src={
-                            user.profilePicture == ""
-                              ? img
-                              : user.profilePicture
-                          }
-                          alt="profile"
-                          className="card-img-top rounded-circle"
-                          style={{ width: "5vh", height: "5vh" }}
-                        />
-                        <p className="ps-lg-3 ps-3">{user.username}</p>
-                      </div>
-                      <hr />
-                    </div>
-                  ))
-                ) : (
-                  <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                  </div>
-                 
-                )}
-              </div>
+            <div className="contact col-5 border card">
+             <Contact allUsers= {allUsers} changeCurrentChat={changeCurrentChat}/>
             </div>
-            <div className="col-8">
-              <div className="shadow"></div>
-              <div className="input-group border rounded-pill p-2">
-              <button className='border-0' style={{ backgroundColor: 'white' }}><FaRegSmile size='3.5vh' /></button>
-                <input
-                  type="text"
-                  className="form-control border-0 message_input"
-                  placeholder="Message..."
-                  onChange={(e) => setmessageText(e.target.value)}
-                  onKeyPress={(event) => event.key == "Enter" && sendMessage()}
-                />
-                {
-                  messageText == "" ?
-                  <div>
-                    <button className='border-0' style={{ backgroundColor: 'white' }}><FaRegImage size='3.5vh' /></button>
-                    <button className='border-0' style={{ backgroundColor: 'white' }}><FaRegHeart size='3.5vh' /></button>
-                    </div>:
-                <button className="btn bg-white text-info">Send</button>
-                }
-              </div>
+            <div className="chatBody col-7">
+              <ChatContainer sendMsg={sendMsg}/>
             </div>
           </div>
         </div>
-      </div>
-    </>
+    </Container>
   );
 }
 
 export default Messanger;
+
+const Container= styled.div`
+  height: 100vh;
+  border: 1px solid red;
+  @media only screen and (max-width: 768px) and (min-width: 50px){
+    margin: 0;
+  }
+`

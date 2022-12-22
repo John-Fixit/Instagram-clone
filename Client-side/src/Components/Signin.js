@@ -14,8 +14,6 @@ function Signin() {
   const URI = "http://localhost:4000/user/signin";
   const [message, setmessage] = useState("");
   const [status, setstatus] = useState("");
-  const [time, settime] = useState("");
-  const [error, seterror] = useState("");
   const [disableBtn, setdisableBtn] = useState(false);
   const [isComing, setisComing] = useState(false);
   const formik = useFormik({
@@ -36,7 +34,6 @@ function Signin() {
           console.log(res)
           setisComing(false);
           setdisableBtn(false)
-          if (res.status==200) {
             if (feedBack.status) {
               const token = res.data.token;
               localStorage.token = JSON.stringify(token);
@@ -45,11 +42,11 @@ function Signin() {
               setstatus(feedBack.status);
               setmessage(feedBack.message);
             }
-          }
         })
         .catch((err) => {
-          console.log(err);
-          seterror(`An error occur`);
+          setisComing(false);
+          setmessage(err.message);
+          setdisableBtn(false)
         });
     },
     validationSchema: yup.object({
@@ -61,17 +58,23 @@ function Signin() {
   return (
     <>
       <div className="container">
-        <div className="row my-5">
-          {time}
+        <div className="row my-2">
           <div className="col-md-4">
             <div className="card-img-non"></div>
           </div>
           <div className="col-md-8">
             <div className="col-lg-6 col-md-12">
-              <div className="card h-100 px-4">
+              <div className="card h-100 px-3">
                 <h3 className="text-center pt-3">
                   <img src={logo} alt="loading" />
                 </h3>
+                <div className="text-center">
+                    {status ? (
+                      ""
+                    ) : (
+                      <small className="text-danger">{message}</small>
+                    )}
+                  </div>
                 <form action="" onSubmit={formik.handleSubmit}>
                   <div className="form-floating">
                     <input
@@ -113,13 +116,7 @@ function Signin() {
                   ) : (
                     " "
                   )}
-                  <div className="text-center">
-                    {status ? (
-                      ""
-                    ) : (
-                      <small className="text-danger">{message}</small>
-                    )}
-                  </div>
+                  
                   <button
                     className="btn btn-primary text-light text-center mt-3 w-100"
                     type="submit"

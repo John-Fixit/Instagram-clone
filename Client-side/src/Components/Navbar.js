@@ -17,7 +17,6 @@ function Navbar({thisUserDetail}) {
     const [profilePicture, setprofilePicture] = useState('')
     const userDetails = JSON.parse(localStorage.getItem('userDetails'))
     useEffect(() => {
-        console.log(thisUserDetail);
         setprofilePicture(thisUserDetail.profilePicture)
     })
     const logOut = () => {
@@ -27,7 +26,7 @@ function Navbar({thisUserDetail}) {
     }
     return (
         <>
-            <div className='container-fluid border doc_body fixed-top' style={{ backgroundColor: 'white' }}>
+            <div className='container-fluid borde shadow-sm doc_body fixed-top' style={{ backgroundColor: 'white' }}>
                 <div className='container'>
                     <div className='d-flex justify-content-space-evenly text-center gen_nav'>
                         <div className='col-md-4 col-sm-6'>

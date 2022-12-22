@@ -257,18 +257,5 @@ const comment = (req, res) => {
     })
 }
 
-const currentChattingUser=(req, res)=>{
-    console.log(req.body);
-}
 
-const io = server(socket_io, {cors: {origin: '*'}})
-
-io.on('connection', (socket)=>{
-    console.log(`user connected with ${socket.id}`);
-
-    io.on('disconnect', ()=>{
-        console.log(`user disconnect with ${socket.id}`);
-    })
-})
-
-module.exports = { landingPage, signup, signin, home, upload, follow, createPost, savePost, like, comment, currentChattingUser}
+module.exports = { landingPage, signup, signin, home, upload, follow, createPost, savePost, like, comment }

@@ -7,7 +7,8 @@ const server = require('socket.io')
 app.use(bodyParser.urlencoded({extended: true,limit:"100mb"}))
 app.use(bodyParser.json({limit:'100mb'}))
 app.use(cors())
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+const messageRouter = require("./Routes/messageRoute");
 require("dotenv").config();
 const url = process.env.URL
 mongoose.connect(url,(err)=>{
@@ -19,6 +20,7 @@ mongoose.connect(url,(err)=>{
     }
 })
 app.use('/user', userRouter)
+app.use('/message', messageRouter)
 const PORT = process.env.PORT || 3000
 const socket_io = app.listen(PORT, ()=>{
     console.log(`App is listening on port ${PORT}`);
@@ -29,6 +31,7 @@ const io = server(socket_io, {cors: {origin: '*'}})
 global.onlineUser=new Map();
 
 io.on('connection', (socket)=>{
+    console.log(`user connected with id: ${socket.id}`);
     global.chatSocket = socket;
     
     io.on('add_user', (userId)=>{

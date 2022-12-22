@@ -1,17 +1,18 @@
 const { messageModel } = require("../Model/message.model")
 
 const sendMessage = (req, res)=>{
-    const {from, to, message} = req.body
-    messageModel.create({message: {text: req.body.message}, users: [from, to], sender: from}, (err, result)=>{
-        if(err){
-            res.json({message: 'Network error, please check your connection!', status: false})
-            console.log(err)
-        }
-        else{
-            res.json({message: 'message sent!', status: true})
-            console.log(result)
-        }
-    })
+    console.log(req.body)
+    // const {from, to, message} = req.body
+    // messageModel.create({message: {text: req.body.messageText}, users: [from, to], sender: from}, (err, result)=>{
+    //     if(err){
+    //         res.json({message: 'Network error, please check your connection!', status: false})
+    //         console.log(err)
+    //     }
+    //     else{
+    //         res.json({message: 'message sent!', status: true})
+    //         console.log(result)
+    //     }
+    // })
 }
 const getMessage = (req, res)=>{
     const {from, to} = req.body

@@ -36,7 +36,6 @@ function Homepage() {
     }).then((res) => {
       if (res.data.status) {
         let responseFromServer = res.data
-        console.log(responseFromServer);
         let userInfo = responseFromServer.userDetails
         setthisUserDetail(()=>{return responseFromServer.userDetails})
         const allUserPost = responseFromServer.allPosts
@@ -86,7 +85,7 @@ function Homepage() {
       <Routes>
         <Route path='/' element={<Home allPosts={allPosts} allUsers={allUsers} userInfo thisUserDetail={thisUserDetail} />} />
         <Route path='/post' element={<Post />}/>
-        <Route path='/chat' element={<Messanger allUsers={allUsers}/>}/>
+        <Route path='/chat' element={<Messanger allUsers={allUsers} thisUserDetail={thisUserDetail}/>}/>
         <Route path='/:id' element={<Profile />} />
         <Route path='/message' element={<Messanger  allUsers={allUsers} thisUserDetail={thisUserDetail}/>} />
       </Routes>
