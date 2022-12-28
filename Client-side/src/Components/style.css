@@ -67,12 +67,6 @@
 .cursorPointer{
     cursor: pointer;
 }
-.chatFriend:hover{
-    background-color: rgb(232, 232, 236);
-    transition: 0.8s cubic-bezier(0.075, 0.82, 0.165, 1);
-    padding: 5px;
-}
-
    .dropdown-menu{
     display: none;
    }

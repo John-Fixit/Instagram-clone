@@ -15,7 +15,8 @@ function Profile() {
     const [followers, setfollowers] = useState([])
     const [fullname, setfullname] = useState("")
     const [username, setusername] = useState("")  
-    const userDetails = JSON.parse(localStorage.getItem('userDetails'))
+    // const userDetails = JSON.parse(localStorage.getItem('userDetails'))
+    const userDetails = {}
     useEffect(()=>{
         setprofilePicture(userDetails.profilePicture)
         setfollowers(userDetails.followers)

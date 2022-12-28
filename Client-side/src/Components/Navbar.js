@@ -14,11 +14,7 @@ import userProfile from '../Images/user.PNG'
 import { useNavigate } from 'react-router-dom'
 function Navbar({thisUserDetail}) {
     const navigate = useNavigate()
-    const [profilePicture, setprofilePicture] = useState('')
     const userDetails = JSON.parse(localStorage.getItem('userDetails'))
-    useEffect(() => {
-        setprofilePicture(thisUserDetail.profilePicture)
-    })
     const logOut = () => {
         localStorage.removeItem('token')
         localStorage.removeItem('userDetails')
@@ -26,7 +22,7 @@ function Navbar({thisUserDetail}) {
     }
     return (
         <>
-            <div className='container-fluid borde shadow-sm doc_body fixed-top' style={{ backgroundColor: 'white' }}>
+            <div className='container-fluid borde shadow-sm doc_body' style={{ backgroundColor: 'white' }}>
                 <div className='container'>
                     <div className='d-flex justify-content-space-evenly text-center gen_nav'>
                         <div className='col-md-4 col-sm-6'>
@@ -56,7 +52,7 @@ function Navbar({thisUserDetail}) {
                                     <div className="btn-group">
                                         <button type="button" className="btn dropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                             
-                                            <img src={thisUserDetail!=undefined ? thisUserDetail.profilePicture : userProfile} alt="profile" className='card-img-top rounded-circle' style={{ width: '5vh', height: '5vh' }} />
+                                            <img src={(thisUserDetail && !! thisUserDetail.profilePicture) ? thisUserDetail.profilePicture : userProfile} alt="profile" className='card-img-top rounded-circle' style={{ width: '5vh', height: '5vh' }} />
                                         </button>
                                         <ul className="dropdown-menu">
                                             <li><NavLink activeClassName="active" to={thisUserDetail != undefined && "/homepage/" + thisUserDetail._id} className="dropdown-item"><FaRegUser /> Profile</NavLink></li>

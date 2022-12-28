@@ -31,18 +31,17 @@ const io = server(socket_io, {cors: {origin: '*'}})
 global.onlineUser=new Map();
 
 io.on('connection', (socket)=>{
-    console.log(`user connected with id: ${socket.id}`);
     global.chatSocket = socket;
     
     io.on('add_user', (userId)=>{
         onlineUser.set(userId, socket.id)
     })
 
-    io.on('send-msg', (msgData)=>{
+    io.on('send_msg', (msgData)=>{
         console.log(msgData)
         const sendUserSocket = onlineUser.get(msgData.to)
         if(sendUserSocket){
-            io.to(sendUserSocket).emit('recieve-msg', {message: msgData.msg})
+            io.to(sendUserSocket).emit('recieve_msg', {message: msgData.message})
         }
     })
 

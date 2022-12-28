@@ -81,7 +81,7 @@ function Homepage() {
 
   return (
     <>
-      <Navbar thisUserDetail={thisUserDetail}/>
+          {/* <Navbar thisUserDetail={thisUserDetail}/> */}
       <Routes>
         <Route path='/' element={<Home allPosts={allPosts} allUsers={allUsers} userInfo thisUserDetail={thisUserDetail} />} />
         <Route path='/post' element={<Post />}/>

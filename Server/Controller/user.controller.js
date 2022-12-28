@@ -2,9 +2,7 @@
 const { userModel, userPostModel } = require('../Model/user.model')
 const jwt = require('jsonwebtoken')
 const cloudinary = require('cloudinary')
-const socket_io = require('../index')
-const server = require('socket.io')
-const cors = require('cors')
+
 
 require('dotenv').config()
 const SECRET = process.env.JWT_SECRET
@@ -16,7 +14,7 @@ cloudinary.config({
 });
 
 const landingPage = (req, res) => {
-    console.log(`I dey work John Fixit`);
+    console.log(`I am working`);
 }
 const signup = (req, res) => {
     const userDetails = req.body;
