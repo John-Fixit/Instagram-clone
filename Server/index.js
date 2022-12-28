@@ -28,24 +28,23 @@ const socket_io = app.listen(PORT, ()=>{
 
 module.exports = socket_io
 const io = server(socket_io, {cors: {origin: '*'}})
-global.onlineUser=new Map();
+global.onlineUsers = new Map();
 
-io.on('connection', (socket)=>{
+io.on("connection", (socket)=>{
     global.chatSocket = socket;
     
-    io.on('add_user', (userId)=>{
-        onlineUser.set(userId, socket.id)
+    socket.on('add_user', (userId)=>{
+        onlineUsers.set(userId, socket.id)
     })
 
-    io.on('send_msg', (msgData)=>{
-        console.log(msgData)
-        const sendUserSocket = onlineUser.get(msgData.to)
+    socket.on('send_msg', (msgData)=>{
+        const sendUserSocket = onlineUsers.get(msgData.to)
         if(sendUserSocket){
-            io.to(sendUserSocket).emit('recieve_msg', {message: msgData.message})
+            socket.to(sendUserSocket).emit('recieve_msg', {message: msgData.message})
         }
     })
 
-    io.on('disconnect', ()=>{
+    socket.on('disconnect', ()=>{
        console.log(`user disconnected with id: ${socket.id}`)
     })
 })

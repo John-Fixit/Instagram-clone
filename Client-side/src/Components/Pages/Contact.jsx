@@ -27,32 +27,7 @@ function Contact({ allUsers, changeCurrentChat, currentUser }) {
           <span className="" style={{fontSize: '2.3vh'}}>PRIMARY</span>
           <span className="mx-3 text-muted" style={{fontSize: '2.3vh'}}>GENERAL</span>
       </div>
-      <div className="users py-2">
-        {allUsers.length ? (
-          allUsers.map((user, index) => (
-            <div
-              key={index}
-              className={`cursorPointer ${
-                index == selectedIndex ? "selected" : ""
-              }`}
-              onClick={() => changeCurrentChatFunc({ index, user })}
-            >
-              <div className="chatFriend">
-                <img
-                  src={user.profilePicture == "" ? img : user.profilePicture}
-                  alt="profile"
-                  className="rounded-circle"
-                />
-                <p className="ps-lg-3 ps-2">{user.username}</p>
-              </div>
-            </div>
-          ))
-          
-        ) : (
-          <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </div>
-        )}
+      <div className="users">
         {allUsers.length ? (
           allUsers.map((user, index) => (
             <div
@@ -87,6 +62,7 @@ export default Contact;
 const ContactContainer = styled.div`
   border: 0.5px solid #DEE2E6;
   height: 95vh;
+  overflow: hidden;
   .header{
     .user_headers{
       .cursorPointer{
@@ -97,7 +73,16 @@ const ContactContainer = styled.div`
   .users {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    height: 90vh;
+    overflow: auto;
+    &::-webkit-scrollbar{
+      width: 2px;
+      transition: 0.5s;
+      &-thumb{
+        background-color: #DEE2E6;
+        border-radius: 3vh;
+      }
+    }
     .chatFriend{
         display: flex;
         gap: 0.5rem;

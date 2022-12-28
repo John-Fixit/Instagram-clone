@@ -7,19 +7,17 @@ import ChatContainer from "./Pages/ChatContainer";
 import styled from "styled-components";
 
 import axios from "axios";
-import { baseUrl, sendMsg } from "./Utils/ApiRoutes";
-// const socket = io.connect(baseUrl);
+import { baseUrl } from "./Utils/ApiRoutes";
+const socket = io.connect(baseUrl);
 function Messanger({ allUsers, thisUserDetail }) {
 const [currentChat, setcurrentChat] = useState(undefined)
 
 useEffect(()=>{
   if(thisUserDetail){
-    socket.current = io(baseUrl)
-    socket.current.emit('add_user', thisUserDetail._id)
+    socket.emit('add_user', thisUserDetail._id)
   }
 }, [thisUserDetail])
 
-const socket = useRef()
   const changeCurrentChat=(data)=>{
       setcurrentChat(data)
   }

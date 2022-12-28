@@ -18,13 +18,13 @@ const landingPage = (req, res) => {
 }
 const signup = (req, res) => {
     const userDetails = req.body;
-    userModel.findOne({ email: req.body.email }, (err, result) => {
+    userModel.findOne({ email: req.body.email, username: req.body.username }, (err, result) => {
         if (err) {
             res.status(501).send({ message: `Internal error, registration not yet done`, status: false })
         }
         else {
             if (result) {
-                console.log(`The email is already used`);
+                console.log(`The email is already in used`);
                 res.send({ message: `Unsuccesful, the email is already used`, status: false })
             }
             else {
@@ -76,6 +76,7 @@ const home = (req, res) => {
     const token = req.headers.authorization.split(' ')[1]
     jwt.verify(token, SECRET, (err, result) => {
         if (err) {
+            console.log(err);
             console.log(`unathorized user`);
             res.send({ status: false, message: `unathorized user` })
         }

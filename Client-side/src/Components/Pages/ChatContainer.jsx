@@ -8,16 +8,18 @@ import {
   FaRegHeart,
   FaTelegramPlane,
 } from "react-icons/fa";
+import Picker, { EmojiStyle } from "emoji-picker-react";
 import { FiSend } from "react-icons/fi";
 import styled from "styled-components";
 import user from "../../Images/user.PNG";
-import { getMsg, sendMsg } from "../Utils/ApiRoutes";
+import { getMsg, sendImgAsMsg, sendMsg } from "../Utils/ApiRoutes";
 import { useRef } from "react";
 function ChatContainer({ currentUser, currentChat, socket }) {
   const [messageText, setmessageText] = useState("");
   const [messages, setmessages] = useState([]);
   const [arrivalMessage, setarrivalMessage] = useState(undefined);
   const [isLoading, setisLoading] = useState(false);
+  const [emojiDisplay, setemojiDisplay] = useState(false);
   let currentTime = new Date();
   const scrollRef = useRef();
   useEffect(() => {
@@ -40,7 +42,7 @@ function ChatContainer({ currentUser, currentChat, socket }) {
         message: messageText,
       };
       axios.post(sendMsg, data);
-      socket.current.emit("send_msg", data);
+      socket.emit("send_msg", data);
       let newMsg = {
         fromSelf: true,
         message: messageText,
@@ -53,30 +55,52 @@ function ChatContainer({ currentUser, currentChat, socket }) {
   };
 
   useEffect(() => {
-    if (socket.current) {
-      socket.current.on("recieve_msg", (data) => {
-        console.log(data);
+    if (socket) {
+      socket.on("recieve_msg", (data) => {
         let newMsgRecieved = {
           fromSelf: false,
-          message: data,
-          time: currentTime.toLocaleTimeString(),
+          message: data.message,
+          time:
+            currentTime.toDateString() + " " + currentTime.toLocaleTimeString(),
         };
-        console.log(newMsgRecieved);
         setarrivalMessage(newMsgRecieved);
-        // if(!!data){
-        //     setmessages((prev)=>[...prev, newMsgRecieved])
-        // }
       });
     }
   }, []);
 
   useEffect(() => {
-    arrivalMessage && setmessages((prev) => [prev, arrivalMessage]);
+    arrivalMessage && setmessages((prev) => [...prev, arrivalMessage]);
   }, [arrivalMessage]);
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behaviour: "smooth" });
   }, [messages]);
+
+  const showEmojis = () => {
+    setemojiDisplay(!emojiDisplay);
+  };
+
+  const emojiClicked = (emoji) => {
+    let msg = messageText;
+    msg += emoji.emoji;
+    setmessageText(msg);
+  };
+
+  const sendImage = (e) => {
+    const fileChoosed = e.target.files[0];
+    let reader = new FileReader();
+    reader.readAsDataURL(fileChoosed);
+    reader.onload = () => {
+      console.log(reader.result);
+      const data = {
+        from: currentUser._id,
+        to: currentChat._id,
+        imgUrl: reader.result,
+      };
+      axios.post(sendImgAsMsg, data);
+    };
+  };
+
   return (
     <>
       <ChatStyleContainer>
@@ -126,15 +150,37 @@ function ChatContainer({ currentUser, currentChat, socket }) {
                               message.fromSelf && "ms-auto"
                             }`}
                           >
-                            <span
-                              className={`text-start px-3 ${
-                                message.fromSelf
-                                  ? "ms-auto border-0"
-                                  : "border reciever"
-                              }`}
-                            >
-                              {message.message}
-                            </span>
+                            {message.msgType ? (
+                              message.msgType == "text" ? (
+                                <span
+                                  className={`text-start px-2 ${
+                                    message.fromSelf
+                                      ? "border-0"
+                                      : "border py-1 reciever"
+                                  }`}
+                                >
+                                  {message.message}
+                                </span>
+                              ) : (
+                                <img
+                                  src={message.message}
+                                  alt="loading"
+                                    className={`msgImg text-start p-3 ${
+                                      !message.fromSelf&& "border reciever"
+                                    }`}
+                                />
+                              )
+                            ) : (
+                              <span
+                                className={`text-start px-3 ${
+                                  message.fromSelf
+                                    ? "ms-auto border-0"
+                                    : "border py-1 reciever"
+                                }`}
+                              >
+                                {message.message}
+                              </span>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -147,7 +193,22 @@ function ChatContainer({ currentUser, currentChat, socket }) {
                 )}
               </div>
               <div className="message-form border rounded-pill px-2">
-                <FaRegSmile size="3.5vh" />
+                <div className="emoji">
+                  <FaRegSmile
+                    size="3.5vh"
+                    onClick={showEmojis}
+                    className={`emojiIcon`}
+                  />
+                  {emojiDisplay && (
+                    <EmojiSection className="shadow-sm">
+                      <Picker
+                        onEmojiClick={emojiClicked}
+                        className="emoji-box"
+                        width={300}
+                      />
+                    </EmojiSection>
+                  )}
+                </div>
                 <input
                   type="text"
                   className="form-control border-0"
@@ -158,8 +219,21 @@ function ChatContainer({ currentUser, currentChat, socket }) {
                 />
                 {messageText == "" ? (
                   <div className="d-flex">
-                    <FaRegImage size="3.5vh" className="mx-1" />
-                    <FaRegHeart size="3.5vh" />
+                    <label htmlFor="imgFile">
+                      <FaRegImage
+                        size="3.5vh"
+                        className="mx-1"
+                        cursor={"pointer"}
+                      />
+                      <input
+                        type="file"
+                        id="imgFile"
+                        className="d-none"
+                        onChange={(e) => sendImage(e)}
+                        accept="jpg, png, jpeg, gif"
+                      />
+                    </label>
+                    <FaRegHeart size="3.5vh" cursor={"pointer"} />
                   </div>
                 ) : (
                   <button
@@ -197,6 +271,13 @@ function ChatContainer({ currentUser, currentChat, socket }) {
 }
 
 export default ChatContainer;
+const EmojiSection = styled.div`
+  position: absolute;
+  bottom: 2.5rem;
+  left: -10px;
+  height: 50vh;
+  overflow: hidden;
+`;
 
 const ChatStyleContainer = styled.div`
   height: 95vh;
@@ -243,6 +324,10 @@ const ChatStyleContainer = styled.div`
           .reciever {
             border-radius: 0.6rem;
           }
+          .msgImg{
+            height: 10rem;
+            width: 8rem;
+          }
         }
       }
       .sender {
@@ -264,6 +349,12 @@ const ChatStyleContainer = styled.div`
   .message-form {
     display: flex;
     align-items: center;
+    .emoji{
+      position: relative;
+      .emojiIcon{
+        cursor: pointer;
+      }
+    }
   }
   .init_Msg {
     display: flex;

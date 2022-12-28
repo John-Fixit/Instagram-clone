@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useRef} from 'react'
 import { Route, Routes, useNavigate } from 'react-router-dom'
 import Navbar from './Navbar'
 import Messanger from './Messanger'
@@ -6,6 +6,8 @@ import Home from './Home'
 import Profile from './Profile'
 import axios from 'axios'
 import Post from './Post'
+import { io } from 'socket.io-client'
+import { baseUrl } from './Utils/ApiRoutes'
 function Homepage() {
   const URI = 'http://localhost:4000/user/home'
  const [fullname, setfullname] = useState("")
@@ -25,6 +27,7 @@ function Homepage() {
   useEffect(() => {
     getHome()
   }, [])
+  const socket = useRef()
   const getHome = () => {
     const token = JSON.parse(localStorage.getItem('token'))
     axios.get(URI, {
