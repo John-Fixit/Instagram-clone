@@ -347,13 +347,11 @@ const Container = styled.div`
         align-items: center;
         gap: 2rem;
       }
-      .user_bio {
-      }
     }
   }
   .profile_body {
     margin: 0rem 5rem;
-    min-height: 50vh;
+    min-height: 55vh;
     .activities_menu {
       padding: 0 17rem;
       display: flex;

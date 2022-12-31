@@ -78,7 +78,7 @@ function Navbar({ thisUserDetail }) {
                   activeClassName="active"
                   to={nav.link}
                   key={index}
-                  className={`nav-link text-decoration-none text-dark`}
+                  className={`nav-menu-link text-decoration-none text-dark`}
                 >
                   <p className="nav_icon">{nav.icon}</p>
                   <p className="nav_name fw-light">{nav.name}</p>
@@ -86,7 +86,7 @@ function Navbar({ thisUserDetail }) {
               );
             })}
           </div>
-          <div className="profile_div" onClick={navigateToProfile}>
+          <div className="nav-menu-link" onClick={navigateToProfile}>
             <img
               src={
                 thisUserDetail && !!thisUserDetail.profilePicture
@@ -100,7 +100,7 @@ function Navbar({ thisUserDetail }) {
             <p>Profile</p>
           </div>
         </div>
-        <div className="log_out" data-bs-toggle="modal" data-bs-target="#exampleModal">
+        <div className="nav-menu-link" data-bs-toggle="modal" data-bs-target="#exampleModal">
             <FaPowerOff size={'5vh'} className="text-danger"/>
               <p>Log Out</p>
 
@@ -131,15 +131,19 @@ const NavbarComponent = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  .nav-link {
+  .nav-menu-link {
     display: flex;
     gap: 1rem;
     transition: all 0.5s ease;
     margin: 0.5rem 0;
+    &:hover{
+      background-color: #FAFAFA;
+      border-radius: 5vh;
+    }
+    cursor: pointer;
   }
   .profile_div, .log_out{
     display: flex;
     gap: 1rem;
-    cursor: pointer;
   }
 `;

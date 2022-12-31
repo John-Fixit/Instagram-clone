@@ -97,19 +97,15 @@ function Home({allPosts, allUsers, userInfo, thisUserDetail}) {
               {
                 allPosts.map((eachPost) => (
                   <div className="card mt-4" key={eachPost._id}>
-                    <div className='row ps-3 py-2'>
-                      <div className='col-2 posted_user'>
-                        <Link to=''><img src={eachPost.profilePicture} className='card-img-top border border-dark rounded-circle' style={{ width: '7vh', height: '7vh' }} /></Link>
+                    <div className='post-header px-3 py-2'>
+                      <div className='posted_user'>
+                       <img src={eachPost.profilePicture} className='card-img-top border border-dark rounded-circle' style={{ width: '7vh', height: '7vh' }} />
                         <div>
                           <Link to='' className='text-decoration-none text-dark'>{eachPost.username}</Link><br />
-                          <Link to='' className='text-decoration-none text-dark fw-light'><small >{eachPost.postLocation}<small > Original Audio</small> </small></Link>
+                          <p className=' text-dark'><small >{eachPost.postLocation} .<small > Original Audio</small></small></p>
                           </div>
                       </div>
-                      <div className='col-10 d-flex justify-content-between'>
-                        <div className='col-sm-5'>
-                        </div>
-                        <div className='col-sm-4 text-end'><button className='border-0 bg-light'>{<FaEllipsisH />}</button></div>
-                      </div>
+                      <FaEllipsisH />
                     </div>
                     <button className='text-dark border-0' style={{ backgroundColor: 'white' }}><img src={eachPost.postLink} className='card-img-top' /></button>
                     <div className='px-4'>
@@ -288,7 +284,16 @@ display: flex;
   width: 40vw;
   overflow: auto;
   overflow-x: hidden;
-
+  .post-header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .posted_user{
+      display: flex;
+      gap: 0.7rem;
+    }
+  }
+  
 }
 .scroll-col::-webkit-scrollbar {
   width: 3px;
