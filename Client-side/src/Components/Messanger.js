@@ -26,12 +26,12 @@ useEffect(()=>{
 
   return (
     <Container>
-      <div className="my-3 col-sm-9 mx-auto">
+      <div className="my-3 col-sm-10 mx-auto">
           <div className="row">
-            <div className="contact col-4">
+            <div className="contact col-5">
              <Contact allUsers= {allUsers} changeCurrentChat={changeCurrentChat} currentUser={thisUserDetail}/>
             </div>
-            <div className="chatBody col-8">
+            <div className="chatBody col-7">
               <ChatContainer currentChat={currentChat} currentUser={thisUserDetail} socket={socket}/>
             </div>
           </div>
@@ -43,8 +43,9 @@ useEffect(()=>{
 export default Messanger;
 
 const Container= styled.div`
-overflow: hidden;
+  overflow: hidden;
   height: 100vh;
+  width: 80vw;
 
   @media only screen and (max-width: 768px) and (min-width: 50px){
     margin: 0;

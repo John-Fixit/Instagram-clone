@@ -51,9 +51,17 @@ function Navbar({ thisUserDetail }) {
     },
   ];
 
+  const navigateToProfile =()=>{
+    console.log(thisUserDetail)
+      if(thisUserDetail){
+        navigate(`/homepage/${thisUserDetail.username}`);
+      }
+  }
+
+
   return (
     <>
-      <NavbarComponent className="border-end">
+      <NavbarComponent>
         <div>
           <NavLink activeClassName="active" to="/homepage/home">
             <img
@@ -78,7 +86,7 @@ function Navbar({ thisUserDetail }) {
               );
             })}
           </div>
-          <div className="profile_div">
+          <div className="profile_div" onClick={navigateToProfile}>
             <img
               src={
                 thisUserDetail && !!thisUserDetail.profilePicture
@@ -108,8 +116,7 @@ function Navbar({ thisUserDetail }) {
                     </div>
                   </div>
                 </div>
-              </div>
-              
+              </div> 
         </div>
       </NavbarComponent>
     </>
@@ -120,7 +127,6 @@ export default Navbar;
 
 const NavbarComponent = styled.div`
   height: 100vh;
-  width: 40vh;
   padding: 2rem;
   display: flex;
   flex-direction: column;

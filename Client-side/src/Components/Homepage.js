@@ -8,6 +8,7 @@ import axios from 'axios'
 import Post from './Post'
 import { io } from 'socket.io-client'
 import { baseUrl } from './Utils/ApiRoutes'
+import styled from 'styled-components'
 function Homepage() {
   const URI = 'http://localhost:4000/user/home'
  const [fullname, setfullname] = useState("")
@@ -88,8 +89,11 @@ function Homepage() {
   }
 
   return (
-    <>
-          {/* <Navbar thisUserDetail={thisUserDetail}/> */}
+    <Container>
+      <div className='nav_container border-end'>
+          <Navbar thisUserDetail={thisUserDetail}/>
+      </div>
+      <div className='contents'>
       <Routes>
         <Route path='/home' element={<Home allPosts={allPosts} allUsers={allUsers} userInfo thisUserDetail={thisUserDetail} />} />
         <Route path='/post' element={<Post />}/>
@@ -98,8 +102,20 @@ function Homepage() {
         <Route path='/message' element={<Messanger  allUsers={allUsers} thisUserDetail={thisUserDetail}/>} />
         <Route path='/nav' element={<Navbar />} />
       </Routes>
-    </>
+      </div>
+    </Container>
   )
 }
 
 export default Homepage
+
+const Container = styled.div`
+  display: flex;
+  .nav_container{
+    width: 20vw;
+    position: fixed;
+  }
+  .contents{
+    margin: 0 15rem;
+  }
+`

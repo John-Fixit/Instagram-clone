@@ -79,10 +79,9 @@ function Home({allPosts, allUsers, userInfo, thisUserDetail}) {
   return (
     <>
       <Container className=''>
-        <div className='nav_container'>
+        {/* <div className='nav_container'>
         <Navbar />
-        </div>
-        <div className='content'>
+        </div> */}
           <div className='home_contents'>
             <div className='scroll-col' >
               <div className=' row border py-3 ps-3 rounded-3 my-3 mx-1'>
@@ -265,7 +264,6 @@ function Home({allPosts, allUsers, userInfo, thisUserDetail}) {
               </div>
             </div>
           </div>
-        </div>
       </Container>
       </>
   )
@@ -275,15 +273,12 @@ export default Home
 
 const Container = styled.div`
 display: flex;
-width: 100vw;
 .nav_container{
   width: 20vw;
 }
-.content{
-  width: 80vw;
-  align-items: center;
-}
+
 .home_contents{
+  width: 80vw;
   display: flex;
   justify-content: center;
   gap: 2rem;
