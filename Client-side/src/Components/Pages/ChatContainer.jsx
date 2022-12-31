@@ -6,15 +6,38 @@ import {
   FaRegSmile,
   FaRegImage,
   FaRegHeart,
-  FaTelegramPlane,
 } from "react-icons/fa";
 import Picker, { EmojiStyle } from "emoji-picker-react";
 import { FiSend } from "react-icons/fi";
+import { BsFillHeartFill } from "react-icons/bs";
 import styled from "styled-components";
 import user from "../../Images/user.PNG";
 import { getMsg, sendImgAsMsg, sendMsg } from "../Utils/ApiRoutes";
 import { useRef } from "react";
+import Avatar from '@material-ui/core/Avatar';
+import { makeStyles } from '@material-ui/core/styles';
+import Popper from '@material-ui/core/Popper';
+import Fade from '@material-ui/core/Fade';
+
+const useStyles = makeStyles((theme) => ({
+  paper: {
+    border: '1px solid',
+    padding: theme.spacing(1),
+    backgroundColor: theme.palette.background.paper,
+  },
+}));
+
 function ChatContainer({ currentUser, currentChat, socket }) {
+  const classes = useStyles();
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const handleClick = (event) => {
+    setAnchorEl(anchorEl ? null : event.currentTarget);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'transitions-popper' : undefined;
+
   const [messageText, setmessageText] = useState("");
   const [messages, setmessages] = useState([]);
   const [arrivalMessage, setarrivalMessage] = useState(undefined);
@@ -40,26 +63,27 @@ function ChatContainer({ currentUser, currentChat, socket }) {
         from: currentUser._id,
         to: currentChat._id,
         message: messageText,
+        msgType: 'text'
       };
-      axios.post(sendMsg, data);
-      socket.emit("send_msg", data);
       let newMsg = {
         fromSelf: true,
         message: messageText,
+        msgType: "text",
         time:
           currentTime.toDateString() + " " + currentTime.toLocaleTimeString(),
       };
-      setmessages((prev) => [...prev, newMsg]);
-      setmessageText("");
+      handleSendRequest(data, newMsg)
     }
   };
 
   useEffect(() => {
     if (socket) {
       socket.on("recieve_msg", (data) => {
+        console.log(data)
         let newMsgRecieved = {
           fromSelf: false,
           message: data.message,
+          msgType: data.msgType,
           time:
             currentTime.toDateString() + " " + currentTime.toLocaleTimeString(),
         };
@@ -91,15 +115,61 @@ function ChatContainer({ currentUser, currentChat, socket }) {
     let reader = new FileReader();
     reader.readAsDataURL(fileChoosed);
     reader.onload = () => {
-      console.log(reader.result);
       const data = {
         from: currentUser._id,
         to: currentChat._id,
-        imgUrl: reader.result,
+        message: reader.result,
+        msgType: 'image'
       };
       axios.post(sendImgAsMsg, data);
+      socket.emit("send_msg", data);
+      let newMsg = {
+        fromSelf: true,
+        message: reader.result,
+        msgType: "image",
+        time: currentTime.toDateString() + " " + currentTime.toLocaleTimeString(),
+      };
+      setmessages((prev) => [...prev, newMsg]);
+      handleSendRequest(data, newMsg)
     };
   };
+  const sendHeart=()=>{
+    const data = {
+      from: currentUser._id,
+      to: currentChat._id,
+      message: 'heart shape',
+      msgType: 'heart'
+    };
+    let newMsg = {
+      fromSelf: true,
+      message: 'heart shape',
+      msgType: "heart",
+      time: currentTime.toDateString() + " " + currentTime.toLocaleTimeString(),
+    };
+    handleSendRequest(data, newMsg)
+  }
+
+  const handleSendRequest=(data, newMsg)=>{
+    axios.post(sendMsg, data);
+    socket.emit("send_msg", data);
+    setmessages((prev) => [...prev, newMsg]);
+    setmessageText("");
+  }
+
+const PopperCont =()=>{
+  return <div>
+<button aria-describedby={id} type="button" onClick={handleClick}>
+        Toggle Popper
+      </button>
+      <Popper id={id} open={open} anchorEl={anchorEl} transition>
+        {({ TransitionProps }) => (
+          <Fade {...TransitionProps} timeout={350}>
+            <div className={classes.paper}>The content of the Popper.</div>
+          </Fade>
+        )}
+      </Popper>
+  </div>
+}
 
   return (
     <>
@@ -108,15 +178,11 @@ function ChatContainer({ currentUser, currentChat, socket }) {
           <div>
             <div className="header p-3 border-bottom">
               <div className="user_avatar">
-                <img
-                  src={
+                <Avatar alt="profile picture" src={
                     currentChat && !!currentChat.profilePicture
                       ? currentChat.profilePicture
                       : user
-                  }
-                  alt="loading"
-                  className=""
-                />
+                  } />
                 <span className="mx-2 fw-bold username">
                   {currentChat ? currentChat.username : "username"}
                 </span>
@@ -138,7 +204,9 @@ function ChatContainer({ currentUser, currentChat, socket }) {
                           className={`message mt-1 ${
                             message.fromSelf && "sender"
                           }`}
+                          // onMouseOver={}
                         >
+                          
                           <span
                             className="text-center"
                             style={{ fontSize: "11px" }}
@@ -146,36 +214,46 @@ function ChatContainer({ currentUser, currentChat, socket }) {
                             {message.time}
                           </span>
                           <div
-                            className={`content px-2 ${
-                              message.fromSelf && "ms-auto"
-                            }`}
+                            className={`content ${
+                              message.fromSelf && "ms-auto "
+                            } ${(message.msgType == 'image' || message.msgType == 'heart') && 'p-0 my-1 bg-white'} `}
                           >
                             {message.msgType ? (
-                              message.msgType == "text" ? (
-                                <span
-                                  className={`text-start px-2 ${
-                                    message.fromSelf
-                                      ? "border-0"
-                                      : "border py-1 reciever"
-                                  }`}
-                                >
-                                  {message.message}
-                                </span>
-                              ) : (
-                                <img
+                              <div >
+                                {
+                                  message.msgType == "text" && (
+                                    <span
+                                      className={`text-start px-3 ${
+                                        message.fromSelf
+                                          ? "border-0"
+                                          : "border py-1 reciever"
+                                      }`}
+                                    >
+                                      {message.message}
+                                      
+                                    </span>
+                                  ) 
+                                }
+                                {
+                                  message.msgType == 'image'&&<img
                                   src={message.message}
                                   alt="loading"
-                                    className={`msgImg text-start p-3 ${
-                                      !message.fromSelf&& "border reciever"
-                                    }`}
+                                  className={`msgImg card-img-top ${
+                                    !message.fromSelf && "border reciever"
+                                  }`}
                                 />
-                              )
+                                }
+                                {
+                                  message.msgType == 'heart' &&
+                                  <BsFillHeartFill size={'2.5rem'} className="text-danger"/>
+                                }
+                              
+
+                                </div>
                             ) : (
                               <span
                                 className={`text-start px-3 ${
-                                  message.fromSelf
-                                    ? "ms-auto border-0"
-                                    : "border py-1 reciever"
+                                  !message.fromSelf&&"border py-1 reciever"
                                 }`}
                               >
                                 {message.message}
@@ -218,11 +296,11 @@ function ChatContainer({ currentUser, currentChat, socket }) {
                   onKeyPress={(event) => event.key == "Enter" && sendMessage()}
                 />
                 {messageText == "" ? (
-                  <div className="d-flex">
+                  <div className="upF">
                     <label htmlFor="imgFile">
                       <FaRegImage
                         size="3.5vh"
-                        className="mx-1"
+                        className="mx-3"
                         cursor={"pointer"}
                       />
                       <input
@@ -233,7 +311,7 @@ function ChatContainer({ currentUser, currentChat, socket }) {
                         accept="jpg, png, jpeg, gif"
                       />
                     </label>
-                    <FaRegHeart size="3.5vh" cursor={"pointer"} />
+                    <FaRegHeart size="3.5vh" cursor={"pointer"} onClick={sendHeart}/>
                   </div>
                 ) : (
                   <button
@@ -286,6 +364,8 @@ const ChatStyleContainer = styled.div`
   overflow: hidden;
   .header {
     .user_avatar {
+      display: flex;
+      align-items: center;
       img {
         border-radius: 50%;
         height: 1.6rem;
@@ -303,7 +383,7 @@ const ChatStyleContainer = styled.div`
       padding: 0.3rem 1.5rem;
     }
     .all_messages_container {
-      height: 75vh;
+      height: 72vh;
       display: flex;
       flex-direction: column;
       overflow: auto;
@@ -320,13 +400,13 @@ const ChatStyleContainer = styled.div`
           max-width: 40%;
           overflow-wrap: break-word;
           padding: 0.6rem;
-          border-radius: 1rem;
+          border-radius: 2rem;
+          .msgImg{
+            align-items: center;
+            height: 60%;
+          }
           .reciever {
             border-radius: 0.6rem;
-          }
-          .msgImg{
-            height: 10rem;
-            width: 8rem;
           }
         }
       }
@@ -354,6 +434,11 @@ const ChatStyleContainer = styled.div`
       .emojiIcon{
         cursor: pointer;
       }
+    }
+    .upF{
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
   }
   .init_Msg {

@@ -37,7 +37,7 @@ function Signin() {
             if (feedBack.status) {
               const token = res.data.token;
               localStorage.token = JSON.stringify(token);
-              navigate("/homepage/");
+              navigate("/homepage/home");
             } else {
               setstatus(feedBack.status);
               setmessage(feedBack.message);

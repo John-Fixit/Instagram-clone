@@ -9,8 +9,9 @@ cloudinary.config({
 });
 
 const sendMessage = (req, res)=>{
-    const {from, to, message} = req.body
-    messageModel.create({message: {text: message, msgType: 'text'}, users: [from, to], sender: from}, (err, result)=>{
+    const {from, to, message, msgType} = req.body
+    console.log(req.body)
+    messageModel.create({message: {text: message, msgType: msgType}, users: [from, to], sender: from}, (err, result)=>{
         if(err){
             res.json({message: 'Network error, please check your connection!', status: false})
         }
@@ -41,15 +42,14 @@ const getMessage = (req, res)=>{
 }
 
 const sendImgAsMsg =(req, res)=>{
-    const {from, to, imgUrl} = req.body
-    if(!!imgUrl){      
-            cloudinary.v2.uploader.upload(imgUrl, (err, result)=>{
+    const {from, to, message, msgType} = req.body
+    if(!!message){      
+            cloudinary.v2.uploader.upload(message, (err, result)=>{
                 if(err){
-                    res.json({message: 'Network error, please check your connection!', status: false})
-                    console.log(err)
                 }
                 else{
-                    messageModel.create({message:{text: result.secure_url, msgType: 'image'}, users: [from, to], sender: from}, (err, result)=>{
+                    console.log(req.body.msgType)
+                    messageModel.create({message:{text: result.secure_url, msgType: msgType}, users: [from, to], sender: from}, (err, result)=>{
                             if(err){
                                 res.json({message: 'Network error, please check your connection!', status: false})
                             }
@@ -61,7 +61,6 @@ const sendImgAsMsg =(req, res)=>{
             })
     }
 }
-
 
 module.exports = {
     getMessage,

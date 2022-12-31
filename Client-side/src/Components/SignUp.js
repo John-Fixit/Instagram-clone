@@ -38,19 +38,16 @@ function SignUp() {
             const userDetails = { fullname, username, email, password, profilePicture, followers, userPosts, allMessage };
             setisGoing(true)
             axios.post(url, userDetails).then((res) => {
-                console.log(res);
                 setisLoading(false)
                 setisGoing(false)
                 const responseFromServer = res.data;
+                setstatus(responseFromServer.status)
                 setmessage(responseFromServer.message)
                 if(res.data.status){
                     formik.values.fullname = '';
                     formik.values.username = '';
                     formik.values.email = '';
                     formik.values.password = '';
-                }
-                else{
-                    setstatus(responseFromServer.status)
                 }
             }).catch((err) => {
                 if (err) {

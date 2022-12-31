@@ -7,6 +7,7 @@ const userShema = new mongoose.Schema({
     password: String,
     profilePicture: String,
     followers:[],
+    following: [],
     userPosts:[]
 })
 const userPostSchema = new mongoose.Schema({

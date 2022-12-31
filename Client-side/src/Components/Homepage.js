@@ -54,9 +54,14 @@ function Homepage() {
           user.email != userInfo.email
         ))
         if (found) {
-          setallUsers(() => {
-            return found
+          let filtedUsers = []
+          userInfo.following.map((follower)=>{
+             filtedUsers = found.filter((user)=> follower.friendId != user._id)
           })
+          setallUsers(() => {
+            return filtedUsers
+          })
+          console.log(allUsers)
         }
         setusername(userInfo.username)
         setuser_id(userInfo._id)
@@ -86,11 +91,12 @@ function Homepage() {
     <>
           {/* <Navbar thisUserDetail={thisUserDetail}/> */}
       <Routes>
-        <Route path='/' element={<Home allPosts={allPosts} allUsers={allUsers} userInfo thisUserDetail={thisUserDetail} />} />
+        <Route path='/home' element={<Home allPosts={allPosts} allUsers={allUsers} userInfo thisUserDetail={thisUserDetail} />} />
         <Route path='/post' element={<Post />}/>
         <Route path='/chat' element={<Messanger allUsers={allUsers} thisUserDetail={thisUserDetail}/>}/>
-        <Route path='/:id' element={<Profile />} />
+        <Route path='/:username' element={<Profile />} />
         <Route path='/message' element={<Messanger  allUsers={allUsers} thisUserDetail={thisUserDetail}/>} />
+        <Route path='/nav' element={<Navbar />} />
       </Routes>
     </>
   )

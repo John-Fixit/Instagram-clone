@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import style from './style.css'
-import pp from '../Images/john.jpg'
+import starSpinner from "./Pages/starSpinner.css";
 import { Link, useNavigate, } from 'react-router-dom'
 import { FaEllipsisH, FaRegSmile } from 'react-icons/fa'
 import { FaRegHeart } from 'react-icons/fa'
@@ -8,7 +8,12 @@ import { FaRegComment } from 'react-icons/fa'
 import { FaRegPaperPlane } from 'react-icons/fa'
 import { FaRegBookmark } from 'react-icons/fa'
 import userProfile from '../Images/user.PNG'
+import styled from 'styled-components'
 import axios from 'axios'
+import Button from "@material-ui/core/Button";
+import Snackbar from "@material-ui/core/Snackbar";
+import { FaTimes } from "react-icons/fa";
+import Navbar from './Navbar';
 function Home({allPosts, allUsers, userInfo, thisUserDetail}) {
   const navigate = useNavigate()
   const URI = 'http://localhost:4000/user/home'
@@ -20,27 +25,32 @@ function Home({allPosts, allUsers, userInfo, thisUserDetail}) {
   const [username, setusername] = useState("")
   const [user_id, setuser_id] = useState("")
   const [profilePicture, setprofilePicture] = useState('')
-  const [followText, setfollowText] = useState('follow')
-  const [followerEmail, setfollowerEmail] = useState('')
+  const [followedUserIndex, setfollowedUserIndex] = useState(undefined)
   const [friendsPost, setfriendsPost] = useState([])
   const [currentHours, setcurrentHours] = useState('')
   const [currentMinutes, setcurrentMinutes] = useState('')
-  const [currentSeconds, setcurrentSeconds] = useState('')
   const [userComment, setuserComment] = useState('')
   const [view, setview] = useState('view all')
   const [hideShow, sethideShow] = useState(true)
-
-  let userDetails = JSON.parse(localStorage.getItem('userDetails'))
+  const [resMsg, setresMsg] = useState("")
+  const [open, setOpen] = React.useState(false);
+  const [unFollowedUsers, setunFollowedUsers] = useState(undefined)
+  const [isLoading, setisLoading] = useState(true)
+  useEffect(()=>{
+    console.log(allUsers)
+  })
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen(false);
+  };
   const follow = (followingUser) => {
-    const username = followingUser.username
-    const ownerId = userDetails._id
-    const useremail = followingUser.useremail
-    const followerDetail = { ownerId, username, useremail }
+    const followerDetail = { ownerId: followingUser.ownerId, username:followingUser.username, useremail:followingUser.useremail, userId: followingUser.id, ownerUsername: followingUser.ownerUsername,ownerEmail: followingUser.ownerEmail }
     axios.post(FOLLOWURI, followerDetail).then((res) => {
-      const resultFromServer = res.data;
-      alert(resultFromServer.message)
-      setfollowText('following')
-      setfollowerEmail(followingUser.useremail)
+      setOpen(true)
+      setresMsg(res.data.message)
+      setfollowedUserIndex(followingUser.index)
     })
   }
   const like = (resource) => {
@@ -67,12 +77,15 @@ function Home({allPosts, allUsers, userInfo, thisUserDetail}) {
     }
   }
   return (
-      <body className='gen_body'>
-        <div className='container-fluid'>
-          <div className='row'>
-            <div className='col-3'></div>
-            <div className='col-lg-4 scroll_card col-md-7 scroll-col'>
-              <div className=' row border py-3 ps-3 rounded-3'>
+    <>
+      <Container className=''>
+        <div className='nav_container'>
+        <Navbar />
+        </div>
+        <div className='content'>
+          <div className='home_contents'>
+            <div className='scroll-col' >
+              <div className=' row border py-3 ps-3 rounded-3 my-3 mx-1'>
                 {
                   friendsPost.map((user, index) => (
                     <div className='col-sm-3' key={index}>
@@ -86,13 +99,15 @@ function Home({allPosts, allUsers, userInfo, thisUserDetail}) {
                 allPosts.map((eachPost) => (
                   <div className="card mt-4" key={eachPost._id}>
                     <div className='row ps-3 py-2'>
-                      <div className='col-2'>
-                        <Link to=''><img src={eachPost.profilePicture} className='card-img-top border border-dark rounded-circle' style={{ padding: '2px', width: '7vh', height: '7vh' }} /></Link>
-                      </div>
-                      <div className='col-10 d-flex justify-content-between'>
-                        <div className='col-sm-5 ms-2'>
+                      <div className='col-2 posted_user'>
+                        <Link to=''><img src={eachPost.profilePicture} className='card-img-top border border-dark rounded-circle' style={{ width: '7vh', height: '7vh' }} /></Link>
+                        <div>
                           <Link to='' className='text-decoration-none text-dark'>{eachPost.username}</Link><br />
                           <Link to='' className='text-decoration-none text-dark fw-light'><small >{eachPost.postLocation}<small > Original Audio</small> </small></Link>
+                          </div>
+                      </div>
+                      <div className='col-10 d-flex justify-content-between'>
+                        <div className='col-sm-5'>
                         </div>
                         <div className='col-sm-4 text-end'><button className='border-0 bg-light'>{<FaEllipsisH />}</button></div>
                       </div>
@@ -159,14 +174,20 @@ function Home({allPosts, allUsers, userInfo, thisUserDetail}) {
               }
             </div>
 
-            <div className='col-3 fix_card'>
+            <div className='col-3 fix_card py-5'>
               <div className='row'>
                 <div className='col-sm-3'>
-                  <button className='text-dark border-0' style={{ backgroundColor: 'white' }}><img src={thisUserDetail != undefined ? thisUserDetail.profilePicture : profilePicture} alt="" className='rounded-circle card-img-top' style={{ width: '5vh', height: '5vh' }} /></button>
+                  <button className='text-dark border-0' style={{ backgroundColor: 'white' }}><img src={thisUserDetail && !!thisUserDetail.profilePicture
+                      ? thisUserDetail.profilePicture
+                      : userProfile} alt="" className='rounded-circle card-img-top' style={{ width: '9vh', height: '9vh' }} /></button>
                 </div>
-                <div className='col-sm-7 ps-0'>
-                  <Link to='' className='text-decoration-none text-dark'>{username}</Link>
-                  <p><small className='opacity-50'>{fullname}</small></p>
+                <div className='col-sm-7'>
+                  <Link to='' className='text-decoration-none text-dark'>{thisUserDetail && !!thisUserDetail.username
+                      ? thisUserDetail.username
+                      : "Username"}</Link>
+                  <p><small className='opacity-50'>{thisUserDetail && !!thisUserDetail.fullname
+                      ? thisUserDetail.fullname
+                      : "Name"}</small></p>
                 </div>
                 <div className='col-sm-2 text-end'>
                   <button className='text-info border-0' style={{ fontSize: '2vh', fontWeight: '500', backgroundColor: 'white' }}>Switch</button>
@@ -181,23 +202,48 @@ function Home({allPosts, allUsers, userInfo, thisUserDetail}) {
                 </div>
               </div>
               {
-                allUsers.map((users) => (
+                allUsers.map((users, index) => (
                   <div className='row' key={users._id}>
                     <div className='col-sm-3'>
-
                       <button className='text-decoration-none border-0' style={{ backgroundColor: 'white' }}>
                         {
-                          users.profilePicture == '' ? <img src={userProfile} className='rounded-circle card-img-top border' alt='loading'/> : <img src={users.profilePicture} alt="" className='rounded-circle card-img-top border' />
+                          <img src={!!users.profilePicture
+                            ? users.profilePicture
+                            : userProfile} alt="" className='rounded-circle border' style={{ width: '5vh', height: '5vh' }} />
                         }
                       </button>
-
                     </div>
                     <div className='col-sm-7 p-0'>
                       <Link to='' className='text-decoration-none text-dark'>{users.username}</Link>
-                      <p><small className='opacity-50'>follower's + total you have in common</small></p>
+                      <p><small className='opacity-50'>Instagram user</small></p>
                     </div>
                     <div className='col-sm-2'>
-                      <button className='text-info border-0 ' style={{ fontSize: '2vh', fontWeight: '500', backgroundColor: 'white' }} onClick={() => follow({ username: users.username, useremail: users.email })}>Follow</button>
+                      <FollowComponent>
+                      <button className={`text-info border-0 ${index==followedUserIndex? 'following': 'follow'}`} style={{ fontSize: '2vh', fontWeight: '500', backgroundColor: 'white' }} onClick={() => follow({ownerId: users._id, username: thisUserDetail.username, useremail: thisUserDetail.email, id: thisUserDetail._id, index, ownerUsername: users.username, ownerUsername: users.username, ownerEmail: users.email })}>{ }</button>
+                      </FollowComponent>
+                      <div>
+                  <Snackbar
+                    anchorOrigin={{
+                      vertical: "bottom",
+                      horizontal: "left",
+                    }}
+                    open={open}
+                    autoHideDuration={6000}
+                    onClose={handleClose}
+                    message={`${resMsg}`}
+                    action={
+                      <React.Fragment>
+                        <Button
+                          color="secondary"
+                          size="small"
+                          onClick={handleClose}
+                        >
+                          <FaTimes cursor={"pointer"} size={"3.5vh"} />
+                        </Button>
+                      </React.Fragment>
+                    }
+                  />
+                </div>
                     </div>
                   </div>
                 ))
@@ -218,11 +264,57 @@ function Home({allPosts, allUsers, userInfo, thisUserDetail}) {
                 <small className='opacity-50'>© 2022 INSTAGRAM FROM JFIX</small>
               </div>
             </div>
-            <div className='col-2'></div>
           </div>
         </div>
-      </body>
+      </Container>
+      </>
   )
 }
 
 export default Home
+
+const Container = styled.div`
+display: flex;
+width: 100vw;
+.nav_container{
+  width: 20vw;
+}
+.content{
+  width: 80vw;
+  align-items: center;
+}
+.home_contents{
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+}
+.scroll-col{
+  height: 100vh;
+  width: 40vw;
+  overflow: auto;
+  overflow-x: hidden;
+
+}
+.scroll-col::-webkit-scrollbar {
+  width: 3px;
+  border-radius: 6vh;
+}
+
+.scroll-col::-webkit-scrollbar-thumb{
+  background: rgb(209, 201, 201);
+border-radius: 10px;
+}
+.scroll-col::-webkit-scrollbar-track{
+  box-shadow: inset 0 0 5px rgb(209, 201, 201);
+  border-radius: 10px;
+}
+`
+
+const FollowComponent = styled.div`
+  .following::before{
+    content: 'Following';
+  }
+  .follow::before{
+    content: 'Follow ';
+}
+`

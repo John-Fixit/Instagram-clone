@@ -39,16 +39,14 @@
     color: black;
     opacity: 50%;
 }
-.scroll-col{
-    max-height: 85vh;
-    overflow: auto;
-}
+
 .activePost{
     border-top: 1px solid black;
     opacity: 100%;
+    /* font-weight: ; */
 }
 
-.scroll-col::-webkit-scrollbar {
+/* .scroll-col::-webkit-scrollbar {
     width: 3px;
     border-radius: 6vh;
     overflow: auto;
@@ -62,7 +60,7 @@
 .scroll-col::-webkit-scrollbar-track{
     box-shadow: inset 0 0 5px rgb(209, 201, 201);
     border-radius: 10px;
-}
+} */
 
 .cursorPointer{
     cursor: pointer;

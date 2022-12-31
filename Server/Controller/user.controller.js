@@ -18,23 +18,34 @@ const landingPage = (req, res) => {
 }
 const signup = (req, res) => {
     const userDetails = req.body;
-    userModel.findOne({ email: req.body.email, username: req.body.username }, (err, result) => {
+    userModel.findOne({ username: req.body.username }, (err, result) => {
         if (err) {
             res.status(501).send({ message: `Internal error, registration not yet done`, status: false })
         }
         else {
             if (result) {
-                console.log(`The email is already in used`);
-                res.send({ message: `Unsuccesful, the email is already used`, status: false })
+                res.send({ message: `Unsuccesful, the username already exist`, status: false })
             }
             else {
-                let form = new userModel(userDetails)
-                form.save((err) => {
+                userModel.findOne({ email: req.body.email }, (err, result) => {
                     if (err) {
-                        res.status(501).send({ message: `Internal error`, status: false })
+                        res.status(501).send({ message: `Internal error, registration not yet done`, status: false })
                     }
                     else {
-                        res.status(200).send({ message: `Registration successfull, kindly go ahead to signin!`, status: true })
+                        if (result) {
+                            res.send({ message: `Unsuccesful, the email already exist`, status: false })
+                        }
+                        else {
+                            let form = new userModel(userDetails)
+                            form.save((err) => {
+                                if (err) {
+                                    res.status(501).send({ message: `Internal error`, status: false })
+                                }
+                                else {
+                                    res.status(200).send({ message: `Registration successfull, kindly go ahead to signin!`, status: true })
+                                }
+                            })
+                        }
                     }
                 })
             }
@@ -76,7 +87,6 @@ const home = (req, res) => {
     const token = req.headers.authorization.split(' ')[1]
     jwt.verify(token, SECRET, (err, result) => {
         if (err) {
-            console.log(err);
             console.log(`unathorized user`);
             res.send({ status: false, message: `unathorized user` })
         }
@@ -112,17 +122,17 @@ const upload = (req, res) => {
     cloudinary.v2.uploader.upload(uploadedImage, (err, result) => {
         if (err) {
             console.log(`image not yet uploaded, try again`);
-            res.send({ message: `image not yet uploaded, try again` })
+            res.send({ message: `image not yet uploaded, try again`, status: false })
         }
         else {
             const registerImage = result.secure_url
             userModel.findOneAndUpdate({ '_id': `${userId}` }, { 'profilePicture': `${registerImage}` }, (err, result) => {
                 if (err) {
-                    console.log(`unable to update`);
+                    res.send({ message: `unable to add profile picturr`, status: false})
                 }
                 else {
                     const userProfilePicture = result.profilePicture
-                    res.send({ message: `upload successfully`, userProfilePicture, })
+                    res.send({ message: `Profile Picture added`, status: true })
                 }
             })
         }
@@ -130,17 +140,23 @@ const upload = (req, res) => {
 }
 const follow = (req, res) => {
     console.log(req.body);
-    const followerUsername = req.body.username
-    const followerEmail = req.body.useremail
-    const followerDetails = { followerUsername, followerEmail }
+    const followerDetails = { followerUsername: req.body.username, followerEmail:req.body.useremail, followerId: req.body.userId }
+
+    const followingDetails = {friendUsername: req.body.ownerUsername, friendEmail: req.body.ownerEmail, friendId: req.body.ownerId}
     console.log(followerDetails);
-    const ownerId = req.body.ownerId
-    userModel.findOneAndUpdate({ '_id': `${ownerId}` }, { $push: { 'followers': followerDetails } }, (err, result) => {
+    userModel.findOneAndUpdate({ '_id': `${req.body.ownerId}` }, { $push: { 'followers': followerDetails } }, (err, result) => {
         if (err) {
-            console.log(err);
+            res.send({message: 'Network error', status: false})
         }
         else {
-            res.send({ message: `${followerDetails.followerUsername} is now following you`, status: true })
+            userModel.findOneAndUpdate({ '_id': `${req.body.userId}` }, { $push: { 'following': followingDetails } }, (err, result) => {
+                if (err) {
+                    res.send({message: 'Network error', status: false})
+                }
+                else {
+                    res.send({ message: `You are now following ${req.body.ownerUsername}`, status: true })
+                }
+            })
         }
     })
 }
@@ -167,7 +183,6 @@ const savePost = (req, res) => {
     const comments = req.body.comments
     const userPost = { postCaption, postLink, postLocation, postTime, like, comments }
     const userPostDetails = req.body
-    console.log(userPostDetails);
     userModel.findOneAndUpdate({ '_id': `${userId}` }, { $push: { 'userPosts': userPost } }, (err, result) => {
         if (err) {
             console.log(`unable to post`);
@@ -181,15 +196,8 @@ const savePost = (req, res) => {
         if (err) {
             console.log(`Error dey`);
         }
-        else {
-            userPostModel.find((err, result) => {
-                if (err) {
-                    console.log(`there's error`);
-                }
-                // else {
-                //     // console.log(result);
-                // }
-            })
+        else {         
+            res.send({ message: `Your post will be published shortly`, status: true})
         }
     })
 }
@@ -198,27 +206,20 @@ const like = (req, res) => {
     const postLink = req.body.postLink
     const userId = req.body.user_id;
     let likeDetail = { username }
-    console.log(postLink);
-    userPostModel.findOneAndUpdate({ 'postLink': `${postLink}` }, { $push: { 'noOfLikes': likeDetail } }, (err, result) => {
-        if (err) {
-            console.log(err);
-        } else {
-            // console.log(result);
-        }
-    })
+    userPostModel.findOneAndUpdate({ 'postLink': `${postLink}` }, { $push: { 'noOfLikes': likeDetail } })
     userModel.findOne({ '_id': userId }, (err, thisUser) => {
         if (err) {
-            console.log(err);
+            res.send({message: `Network error`, status: false})
         } else {
             let post = thisUser.userPosts.find(pst => pst.postLink == postLink);
-            console.log(post);
             post.like.push(likeDetail)
-            console.log(post, thisUser.userPosts);
             userModel.findOneAndUpdate({ '_id': userId }, { 'userPosts': thisUser.userPosts }, (err, likeResult) => {
                 if (err) {
-                    console.log(err);
+            res.send({message: `Network error`, status: false})
+            
                 } else {
-                    console.log(likeResult);
+            res.send({message: `successfull`, status: true})
+                   
                 }
             })
         }
@@ -256,5 +257,18 @@ const comment = (req, res) => {
     })
 }
 
+const getUserDetail=(req, res)=>{
+    const username = req.params.username
+    userModel.find((err, result)=>{
+        if(err){
+            res.json({message: 'Network error, please check your connection', status: false})
+        }
+        else{
+            let projectedUser = result.find((user)=>(user.username).toString() == username)
+            res.json({projectedUser, status: true})
+        }
+    })
+}
 
-module.exports = { landingPage, signup, signin, home, upload, follow, createPost, savePost, like, comment }
+
+module.exports = { landingPage, signup, signin, home, upload, follow, createPost, savePost, like, comment, getUserDetail }

@@ -13,10 +13,10 @@ require("dotenv").config();
 const url = process.env.URL
 mongoose.connect(url,(err)=>{
     if(err){
-        console.log(`mongoose not connected!`);
+        console.log(`mongoose not connect!`);
     }
     else{
-        console.log(`mongoose connected successfully!`);
+        console.log(`mongoose connected!`);
     }
 })
 app.use('/user', userRouter)
@@ -40,7 +40,7 @@ io.on("connection", (socket)=>{
     socket.on('send_msg', (msgData)=>{
         const sendUserSocket = onlineUsers.get(msgData.to)
         if(sendUserSocket){
-            socket.to(sendUserSocket).emit('recieve_msg', {message: msgData.message})
+            socket.to(sendUserSocket).emit('recieve_msg', {message: msgData.message, msgType: msgData.msgType})
         }
     })
 

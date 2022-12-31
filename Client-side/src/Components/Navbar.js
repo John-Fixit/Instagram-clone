@@ -1,76 +1,139 @@
-import React, { useEffect, useState } from 'react'
-import { NavLink } from 'react-router-dom'
-import logo from '../Images/word.PNG'
-import { FaHome, FaRegUser } from 'react-icons/fa'
-import { FaFacebookMessenger } from 'react-icons/fa'
-import { FaRegPlusSquare } from 'react-icons/fa'
-import { FaCompass } from 'react-icons/fa'
-import { FaRegHeart } from 'react-icons/fa'
-import { FaRegBookmark } from 'react-icons/fa'
+import React, { useEffect, useState } from "react";
+import { NavLink } from "react-router-dom";
+import logo from "../Images/word.PNG";
+import { FaHome, FaRegUser } from "react-icons/fa";
+import { FaFacebookMessenger, FaPowerOff } from "react-icons/fa";
+import { FaRegPlusSquare } from "react-icons/fa";
+import { FaCompass } from "react-icons/fa";
+import { FaRegHeart } from "react-icons/fa";
+import { FaRegBookmark } from "react-icons/fa";
 import { BiCertification } from "react-icons/bi";
 import { MdAutorenew } from "react-icons/md";
-import style from './style.css'
-import userProfile from '../Images/user.PNG'
-import { useNavigate } from 'react-router-dom'
-function Navbar({thisUserDetail}) {
-    const navigate = useNavigate()
-    const userDetails = JSON.parse(localStorage.getItem('userDetails'))
-    const logOut = () => {
-        localStorage.removeItem('token')
-        localStorage.removeItem('userDetails')
-        navigate('/signin')
-    }
-    return (
-        <>
-            <div className='container-fluid borde shadow-sm doc_body' style={{ backgroundColor: 'white' }}>
-                <div className='container'>
-                    <div className='d-flex justify-content-space-evenly text-center gen_nav'>
-                        <div className='col-md-4 col-sm-6'>
-                            <NavLink activeClassName="active" to='/homepage' ><img src={logo} alt='profile' style={{ width: '17vh' }} className='mt-2' /></NavLink>
-                        </div>
-                        <div className='col-md-4 search col-sm-d-none'>
-                            <input type='search' placeholder='search' className='form-control bg-light' />
-                        </div>
-                        <div className='col-md-4 col-sm-6 '>
-                            <div className='d-flex justify-content-space-evenly pages_icons ps-5 mt-2'>
-                                <div className='col-2'>
-                                    <NavLink activeClassName="active" to='/homepage' id='nav_bar' ><FaHome size='3.5vh' className='text-dark' /></NavLink>
-                                </div>
-                                <div className='col-2'>
-                                    <NavLink activeClassName="active" to='/homepage/chat' id='nav_bar' ><FaFacebookMessenger className='text-dark' size='3.5vh' /></NavLink>
-                                </div>
-                                <div className='col-2'>
-                                    <NavLink activeClassName="active" to='/homepage/post' id='nav_bar' ><FaRegPlusSquare className='text-dark' size='3.5vh' /></NavLink>
-                                </div>
-                                <div className='col-2'>
-                                    <NavLink activeClassName="active" to='/explore' id='nav_bar' ><FaCompass size='3.5vh' className='text-dark' /></NavLink>
-                                </div>
-                                <div className='col-2'>
-                                    <NavLink activeClassName="active" to='/follow' id='nav_bar' ><FaRegHeart size='3.5vh' className='text-dark' /></NavLink>
-                                </div>
-                                <div className='col-2'>
-                                    <div className="btn-group">
-                                        <button type="button" className="btn dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                            
-                                            <img src={(thisUserDetail && !! thisUserDetail.profilePicture) ? thisUserDetail.profilePicture : userProfile} alt="profile" className='card-img-top rounded-circle' style={{ width: '5vh', height: '5vh' }} />
-                                        </button>
-                                        <ul className="dropdown-menu">
-                                            <li><NavLink activeClassName="active" to={thisUserDetail != undefined && "/homepage/" + thisUserDetail._id} className="dropdown-item"><FaRegUser /> Profile</NavLink></li>
-                                            <li><NavLink activeClassName="active" to="/homepage" className="dropdown-item"><FaRegBookmark /> Saved</NavLink></li>
-                                            <li><NavLink activeClassName="active" to="/homepage" className="dropdown-item"><BiCertification /> Settings</NavLink></li>
-                                            <li><NavLink activeClassName="active" to="/homepage" className="dropdown-item"><MdAutorenew /> Switch account</NavLink></li>
-                                            <li><hr className="dropdown-divider" /></li>
-                                            <li><button className="btn dropdown-item" onClick={logOut}>Log out</button></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+import style from "./style.css";
+import userProfile from "../Images/user.PNG";
+import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
+import { GrHomeRounded } from "react-icons/gr";
+function Navbar({ thisUserDetail }) {
+  const navigate = useNavigate();
+  const userDetails = JSON.parse(localStorage.getItem("userDetails"));
+  const logOut = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userDetails");
+    navigate("/signin");
+  };
+
+  const navMenus = [
+    {
+      name: "Home",
+      icon: <GrHomeRounded size={"3.5vh"} />,
+      link: "/homepage/home",
+    },
+    {
+      name: "Messages",
+      icon: <FaFacebookMessenger size={"3.5vh"} />,
+      link: "/homepage/chat",
+    },
+    {
+      name: "Create",
+      icon: <FaRegPlusSquare size={"3.5vh"} />,
+      link: "/homepage/home",
+    },
+    {
+      name: "Explore",
+      icon: <FaCompass size={"3.5vh"} />,
+      link: "/homepage/home",
+    },
+    {
+      name: "Notifications",
+      icon: <FaRegHeart size={"3.5vh"} />,
+      link: "/homepage/home",
+    },
+  ];
+
+  return (
+    <>
+      <NavbarComponent className="border-end">
+        <div>
+          <NavLink activeClassName="active" to="/homepage/home">
+            <img
+              src={logo}
+              alt="profile"
+              style={{ width: "17vh" }}
+              className="mt-2"
+            />
+          </NavLink>
+          <div className="nav-menu">
+            {navMenus.map((nav, index) => {
+              return (
+                <NavLink
+                  activeClassName="active"
+                  to={nav.link}
+                  key={index}
+                  className={`nav-link text-decoration-none text-dark`}
+                >
+                  <p className="nav_icon">{nav.icon}</p>
+                  <p className="nav_name fw-light">{nav.name}</p>
+                </NavLink>
+              );
+            })}
+          </div>
+          <div className="profile_div">
+            <img
+              src={
+                thisUserDetail && !!thisUserDetail.profilePicture
+                  ? thisUserDetail.profilePicture
+                  : userProfile
+              }
+              alt="profile"
+              className="card-img-top rounded-circle"
+              style={{ width: "5vh", height: "5vh" }}
+            />
+            <p>Profile</p>
+          </div>
+        </div>
+        <div className="log_out" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            <FaPowerOff size={'5vh'} className="text-danger"/>
+              <p>Log Out</p>
+
+              <div className="modal fade" id="exampleModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                  <div className="modal-content">
+                    <div className="modal-header">
+                      <h5 className="modal-title text-danger mx-auto" id="exampleModalLabel">Are You Sure to Log Out?</h5>
                     </div>
+                    
+                    <div className="modal-footer">
+                      <button type="button" className="btn btn-danger" data-bs-dismiss="modal" onClick={logOut}>Continue and Log out</button>
+                    </div>
+                  </div>
                 </div>
-            </div>
-        </>
-    )
+              </div>
+              
+        </div>
+      </NavbarComponent>
+    </>
+  );
 }
 
-export default Navbar
+export default Navbar;
+
+const NavbarComponent = styled.div`
+  height: 100vh;
+  width: 40vh;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  .nav-link {
+    display: flex;
+    gap: 1rem;
+    transition: all 0.5s ease;
+    margin: 0.5rem 0;
+  }
+  .profile_div, .log_out{
+    display: flex;
+    gap: 1rem;
+    cursor: pointer;
+  }
+`;
