@@ -96,7 +96,7 @@ function Homepage() {
       <div className='contents'>
       <Routes>
         <Route path='/home' element={<Home allPosts={allPosts} allUsers={allUsers} userInfo thisUserDetail={thisUserDetail} />} />
-        <Route path='/post' element={<Post />}/>
+        <Route path='/post' element={<Post thisUserDetail={thisUserDetail}/>}/>
         <Route path='/chat' element={<Messanger allUsers={allUsers} thisUserDetail={thisUserDetail}/>}/>
         <Route path='/:username' element={<Profile />} />
         <Route path='/message' element={<Messanger  allUsers={allUsers} thisUserDetail={thisUserDetail}/>} />

@@ -175,31 +175,40 @@ const createPost = (req, res) => {
 }
 const savePost = (req, res) => {
     const postCaption = req.body.postCaption
-    const postLink = req.body.postLink
     const postLocation = req.body.postLocation
     const postTime = req.body.postTime
     const userId = req.body.userId
     const like = req.body.like
     const comments = req.body.comments
-    const userPost = { postCaption, postLink, postLocation, postTime, like, comments }
-    const userPostDetails = req.body
-    userModel.findOneAndUpdate({ '_id': `${userId}` }, { $push: { 'userPosts': userPost } }, (err, result) => {
+    const responseFromClient = req.body.convertedFile
+    cloudinary.v2.uploader.upload(responseFromClient, (err, result) => {
         if (err) {
-            console.log(`unable to post`);
-            res.send({ message: `Unable to share your post`, status: false })
+            console.log(err);
+            console.log(`Not uploaded yet`);
+            res.send({ message: `An error occur in the uploading, please try again`, status: false })
         } else {
-            res.send({ message: `Your post will be published shortly`, status: true, result })
+            const userPost = { postCaption, postLink: result.secure_url, postLocation, postTime, like, comments }
+            const userPostDetails = { postCaption, userId, postLocation, username: req.body.username, postTime, profilePicture: req.body.profilePicture, like, comments, postLink: result.secure_url }
+            userModel.findOneAndUpdate({ '_id': `${userId}` }, { $push: { 'userPosts': userPost } }, (err, result) => {
+                if (err) {
+                    console.log(`unable to post`);
+                    res.send({ message: `Unable to share your post`, status: false })
+                } else {
+                    let form = new userPostModel(userPostDetails)
+                    form.save((err) => {
+                        if (err) {
+                            console.log(err)
+                            console.log(`Error dey`);
+                        }
+                        else {         
+                            res.send({ message: `Your post will be published shortly`, status: true})
+                        }
+                    })
+                }
+            })
         }
     })
-    let form = new userPostModel(userPostDetails)
-    form.save((err) => {
-        if (err) {
-            console.log(`Error dey`);
-        }
-        else {         
-            res.send({ message: `Your post will be published shortly`, status: true})
-        }
-    })
+   
 }
 const like = (req, res) => {
     const username = req.body.username;

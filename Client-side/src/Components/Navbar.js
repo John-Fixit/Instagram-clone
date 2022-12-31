@@ -17,6 +17,8 @@ import { GrHomeRounded } from "react-icons/gr";
 function Navbar({ thisUserDetail }) {
   const navigate = useNavigate();
   const userDetails = JSON.parse(localStorage.getItem("userDetails"));
+  const [selectedIndex, setselectedIndex] = useState(0)
+  const [isCreate, setisCreate] = useState(false)
   const logOut = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("userDetails");
@@ -37,7 +39,7 @@ function Navbar({ thisUserDetail }) {
     {
       name: "Create",
       icon: <FaRegPlusSquare size={"3.5vh"} />,
-      link: "/homepage/home",
+      link: "/homepage/post",
     },
     {
       name: "Explore",
@@ -51,12 +53,19 @@ function Navbar({ thisUserDetail }) {
     },
   ];
 
+  const naviagateBtn=(params)=>{
+    setselectedIndex(params.index)
+    navigate(`${params.link}`)
+    console.log(selectedIndex)
+  }
+
   const navigateToProfile =()=>{
-    console.log(thisUserDetail)
+    setselectedIndex(5)
       if(thisUserDetail){
         navigate(`/homepage/${thisUserDetail.username}`);
       }
   }
+
 
 
   return (
@@ -74,18 +83,18 @@ function Navbar({ thisUserDetail }) {
           <div className="nav-menu">
             {navMenus.map((nav, index) => {
               return (
-                <NavLink
-                  activeClassName="active"
-                  to={nav.link}
+                <li
                   key={index}
-                  className={`nav-menu-link text-decoration-none text-dark`}
+                  className={`nav-menu-link text-decoration-none text-dark ${index==selectedIndex&& 'selected'}`}
+                  onClick={()=>naviagateBtn({index, link: nav.link})}
                 >
                   <p className="nav_icon">{nav.icon}</p>
-                  <p className="nav_name fw-light">{nav.name}</p>
-                </NavLink>
+                  <p className={`nav_name ${index==selectedIndex&& 'selected'}`}>{nav.name}</p>
+                </li>
               );
             })}
           </div>
+          
           <div className="nav-menu-link" onClick={navigateToProfile}>
             <img
               src={
@@ -97,7 +106,7 @@ function Navbar({ thisUserDetail }) {
               className="card-img-top rounded-circle"
               style={{ width: "5vh", height: "5vh" }}
             />
-            <p>Profile</p>
+            <p className={`nav_name ${selectedIndex==5&& 'selected'}`}>Profile</p>
           </div>
         </div>
         <div className="nav-menu-link" data-bs-toggle="modal" data-bs-target="#exampleModal">
@@ -118,6 +127,7 @@ function Navbar({ thisUserDetail }) {
                 </div>
               </div> 
         </div>
+        
       </NavbarComponent>
     </>
   );
@@ -136,6 +146,12 @@ const NavbarComponent = styled.div`
     gap: 1rem;
     transition: all 0.5s ease;
     margin: 0.5rem 0;
+    .nav_name{
+      font-weight: lighter !important;
+    }
+    .selected{
+        font-weight: bold !important;
+    }
     &:hover{
       background-color: #FAFAFA;
       border-radius: 5vh;

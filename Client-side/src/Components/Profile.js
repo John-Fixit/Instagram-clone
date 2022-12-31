@@ -209,7 +209,7 @@ function Profile() {
                   : "Username"}
               </p>
               <button className="btn edit_profile_btn">Edit Profile</button>
-              <div className="text-dark">
+              <div className="text-dark setting_btn">
                 <BiCertification size="4vh" />
               </div>
             </div>
@@ -340,6 +340,9 @@ const Container = styled.div`
           &:hover {
             background-color: #dbdbdb;
           }
+        }
+        .setting_btn{
+          cursor: pointer;
         }
       }
       .user_activities_info {
